@@ -1,5 +1,6 @@
 package com.example.logintest.dataaccess
 
+import android.content.SharedPreferences
 import android.util.Log
 import com.example.logintest.utils.Secret
 import kotlinx.coroutines.runBlocking
@@ -12,6 +13,7 @@ import retrofit2.http.Body
 import retrofit2.http.GET
 import retrofit2.http.POST
 import com.example.logintest.utils.Strings.TAG
+import retrofit2.HttpException
 
 //Auth
 data class LoginModel(
@@ -31,11 +33,8 @@ interface AuthAPI{
 
 class AuthAPIService(){
 
-    suspend fun login(): LoginResponse{
-        return api.login(LoginModel(
-            UserName = Secret.USERNAME,
-            password = Secret.PASSWORD
-        ))
+    suspend fun login(creds: LoginModel): LoginResponse{
+        return api.login(creds)
     }
 
     private val api: AuthAPI by lazy{
@@ -66,14 +65,21 @@ data class Reminder(
     val reminderTime: String
 )
 
-class AuthInterceptor: Interceptor {
+class AuthInterceptor(
+    val credMgr: CredManager
+): Interceptor {
 
     private fun getToken(): String{
-        return runBlocking {
-            val t = AuthAPIService().login().token
-            Log.d(TAG, "getToken: $t")
-            t
+        val login = credMgr.getCreds()
+
+        if(login != null) {
+            return runBlocking {
+                val t = AuthAPIService().login(login).token
+                Log.d(TAG, "getToken: $t")
+                t
+            }
         }
+        return "NoCredentials"
     }
 
     override fun intercept(chain: Interceptor.Chain): Response {
@@ -89,17 +95,17 @@ interface ReminderAPI{
     suspend fun getAllReminders(): List<Reminder>
 }
 
-class ReminderAPIService(){
+class ReminderAPIService(credMgr: CredManager) {
 
     private val api : ReminderAPI by lazy {
-        createAPI()
+        createAPI(credMgr)
     }
 
-    private fun createAPI(): ReminderAPI{
+    private fun createAPI(credMgr: CredManager): ReminderAPI{
         return Retrofit.Builder()
             .baseUrl("http://fixitmanmike2.ddns.net:80/")
             .client(OkHttpClient().newBuilder()
-                .addInterceptor(AuthInterceptor())
+                .addInterceptor(AuthInterceptor(credMgr))
                 .build()
             )
             .addConverterFactory(GsonConverterFactory.create())
@@ -107,7 +113,14 @@ class ReminderAPIService(){
             .create(ReminderAPI::class.java)
     }
 
-    suspend fun getAllReminders() : List<Reminder> = api.getAllReminders()
+    suspend fun getAllReminders() : List<Reminder> {
+        return try {
+            api.getAllReminders()
+        }catch(e: HttpException){
+            Log.e(TAG, "getAllReminders: ${e.message()}" )
+            listOf<Reminder>()
+        }
+    }
 
 
 
