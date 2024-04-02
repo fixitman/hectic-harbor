@@ -4,7 +4,7 @@ import android.app.Application
 import androidx.compose.runtime.mutableStateListOf
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.logintest.dataaccess.CredManager
+import com.example.logintest.dataaccess.CredentialManager
 import com.example.logintest.dataaccess.LoginModel
 import com.example.logintest.dataaccess.ReminderAPIService
 import com.example.logintest.utils.Secret
@@ -13,7 +13,7 @@ import kotlinx.coroutines.launch
 class MainViewModel(application: Application) : AndroidViewModel(application)
 {
     var reminders = mutableStateListOf<com.example.logintest.dataaccess.Reminder>()
-    var credManager: CredManager = CredManager(getApplication<Application>().applicationContext) { getCreds() }
+    var credManager: CredentialManager = CredentialManager(getApplication<Application>().applicationContext)
 
 
     fun getReminders(){
