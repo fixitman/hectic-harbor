@@ -11,51 +11,54 @@ import retrofit2.http.Body
 import retrofit2.http.GET
 import retrofit2.http.POST
 import com.example.logintest.utils.Strings.TAG
+import retrofit2.Call
 import retrofit2.HttpException
 import java.time.LocalDateTime
 
 //Auth
 data class LoginModel(
-    val UserName: String,
-    val password: String
+    var UserName: String,
+    var password: String,
+    var remember: Boolean = false
 )
 
 data class LoginResponse(
-    val expiration: String,
-    val token: String
+    var expiration: String,
+    var token: String
 )
 
 interface AuthAPI{
     @POST("Account/login")
     suspend fun login(@Body loginModel:LoginModel): LoginResponse?
+
+    @POST("Account/login")
+    fun loginCall(@Body loginModel:LoginModel): Call<LoginResponse?>
 }
 
 class AuthAPIService(){
 
-    suspend fun login(creds: LoginModel): LoginResponse?{
-
-        try{
-            val res = api.login(creds)
-            return res
-
-        }catch(e : HttpException){
-            return null
-        }
-
-    }
-
     private val api: AuthAPI by lazy{
         createAPI()
+    }
+
+    fun login(creds: LoginModel): LoginResponse?{
+        return try{
+            api.loginCall(creds).execute().let{response ->
+                if(response.isSuccessful){
+                    response.body()
+                }else{
+                    null
+                }
+            }
+        }catch(e : HttpException){
+            null
+        }
     }
 
     private fun createAPI(): AuthAPI {
         return Retrofit.Builder()
             .baseUrl("http://fixitmanmike2.ddns.net:80/")
             .addConverterFactory(GsonConverterFactory.create())
-//            .client(OkHttpClient.Builder()
-//                .addInterceptor(AuthErrorInterceptor())
-//                .build()
-//            )
             .build()
             .create(AuthAPI::class.java)
     }
@@ -63,21 +66,8 @@ class AuthAPIService(){
 }
 
 
-class AuthErrorInterceptor: Interceptor{
-    override fun intercept(chain: Interceptor.Chain): Response {
-        val req = chain.request()
-        val resp = chain.proceed(req)
-        when(resp.code()){
-            401 -> {
 
-
-            }
-        }
-        return resp
-    }
-
-}
-
+////////////////////////////////////////////////////////////////////////////////////////////////
 
 
 
@@ -95,7 +85,6 @@ data class Reminder(
 class AuthInterceptor(
     val credMgr: CredentialManager
 ): Interceptor {
-
 
     override fun intercept(chain: Interceptor.Chain): Response {
         val currentRequest = chain.request().newBuilder()

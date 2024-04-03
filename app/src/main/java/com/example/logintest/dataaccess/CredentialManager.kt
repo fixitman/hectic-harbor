@@ -6,7 +6,8 @@ import kotlinx.coroutines.runBlocking
 import java.time.LocalDateTime
 
 class CredentialManager(
-    val ctx: Context
+    private val ctx: Context,
+    private val getCredsFunction : () -> LoginModel
 ) {
     companion object{
         private const val CREDS: String = "CREDENTIALS"
@@ -18,43 +19,56 @@ class CredentialManager(
     }
 
     fun getToken() : String{
+        // try to use saved token
         var token = getSavedToken()
         if(!token.isNullOrBlank()){
             return token
         }
+        // no saved token (or expired)
         var creds = getSavedCreds()
         if(creds != null){
-            token = getNewTokenWithCreds(creds)
+            token = getNewToken(creds)
             if(!token.isNullOrBlank()){
                 return token
             }
         }
-        //if we're here, creds are no good
+        // saved creds are no good
         while(token == null){
             creds = getNewCreds()
-            token = getNewTokenWithCreds(creds)
+            token = getNewToken(creds)
+            if(!token.isNullOrBlank() && creds.remember){
+                saveCreds(creds)
+            }
         }
         return token
 
     }
 
+    private fun saveCreds(creds: LoginModel) {
+        ctx.getSharedPreferences(CREDS, Context.MODE_PRIVATE)?.run {
+            edit()
+                .putString(USER,creds.UserName)
+                .putString(PASS, creds.password)
+                .apply()
+        }
+    }
+
     private fun getNewCreds(): LoginModel {
         //TODO("Not yet implemented")
         //return LoginModel(Secret.USERNAME, Secret.PASSWORD)
-        return LoginModel(UserName = "wrong", "password")
+        //return LoginModel(UserName = "wrong", "password")
+        return getCredsFunction()
     }
 
-    fun getSavedCreds(): LoginModel? {
+    private fun getSavedCreds(): LoginModel? {
 
-        val savedCreds = ctx.getSharedPreferences(CREDS, Context.MODE_PRIVATE)
-        savedCreds?.let{
-            val user = savedCreds.getString(USER,"")
-            if(user != ""){
-                val pw = savedCreds.getString(PASS, "")
-                return LoginModel(user!!,pw!!)
+        ctx.getSharedPreferences(CREDS, Context.MODE_PRIVATE)?.run{
+            val user = getString(USER,"")
+            if(!user.isNullOrBlank()){
+                val pw = getString(PASS, "")
+                return LoginModel(user,pw?: "")
             }
         }
-
         return null
     }
 
@@ -73,11 +87,11 @@ class CredentialManager(
         return null
     }
 
-    private fun getNewTokenWithCreds(model: LoginModel): String? {
-       var r =  runBlocking {
-            val m = AuthAPIService().login(model)
-            m?.token
-        }
-        return r
+    private fun getNewToken(model: LoginModel): String? {
+       return  AuthAPIService().login(model)?.token
+
     }
+
+
+
 }

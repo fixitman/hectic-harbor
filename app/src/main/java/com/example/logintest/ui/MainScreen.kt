@@ -12,16 +12,12 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.CardElevation
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.MaterialTheme.typography
 import androidx.compose.material3.Text
-import androidx.compose.material3.Typography
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -55,6 +51,18 @@ fun MainScreen(
                 }
             }
         }
+    }
+    if(viewModel.showLoginDialog){
+        LoginDialog(
+            onDismiss = viewModel::dismissLogin,
+            onSubmit = viewModel::submitLogin,
+            username = viewModel.credentials.value.UserName,
+            updateUsername = { viewModel.credentials.value.UserName = it },
+            password = viewModel.credentials.value.password,
+            updatePassword = {viewModel.credentials.value.password = it},
+            saveCreds = viewModel.credentials.value.remember,
+            updateSaveCreds = {viewModel.credentials.value.remember = it},
+        )
     }
 
 }
