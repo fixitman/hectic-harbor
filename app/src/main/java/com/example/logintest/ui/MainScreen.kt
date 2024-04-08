@@ -56,12 +56,13 @@ fun MainScreen(
         LoginDialog(
             onDismiss = viewModel::dismissLogin,
             onSubmit = viewModel::submitLogin,
+            onExit = viewModel::onExit,
             username = viewModel.credentials.value.UserName,
-            updateUsername = { viewModel.credentials.value.UserName = it },
+            updateUsername =  viewModel::udpadeUser ,
             password = viewModel.credentials.value.password,
-            updatePassword = {viewModel.credentials.value.password = it},
+            updatePassword = viewModel::updatePassword,
             saveCreds = viewModel.credentials.value.remember,
-            updateSaveCreds = {viewModel.credentials.value.remember = it},
+            updateSaveCreds = viewModel::updateRemember,
         )
     }
 

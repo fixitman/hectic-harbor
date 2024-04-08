@@ -6,6 +6,8 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardActions
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.MaterialTheme.typography
@@ -15,6 +17,9 @@ import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.input.PlatformImeOptions
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -30,7 +35,8 @@ fun LoginDialog(
     saveCreds: Boolean = false,
     updateSaveCreds: (Boolean)-> Unit = {},
     onDismiss: () -> Unit = {},
-    onSubmit: () -> Unit = {}
+    onSubmit: () -> Unit = {},
+    onExit: () -> Unit = {}
 ) {
     Dialog(
         onDismissRequest = onDismiss,
@@ -56,6 +62,8 @@ fun LoginDialog(
                     value = username,
                     onValueChange = updateUsername,
                     label = { Text("Username") },
+                    maxLines = 1,
+                    keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next),
                     modifier = Modifier
                         .fillMaxWidth()
                 )
@@ -63,6 +71,9 @@ fun LoginDialog(
                     value = password,
                     onValueChange = updatePassword,
                     label = { Text("Password") },
+                    keyboardOptions = KeyboardOptions(imeAction = ImeAction.Go, keyboardType = KeyboardType.Password, autoCorrect = false),
+                    keyboardActions = KeyboardActions(onGo = {onSubmit()}),
+
                     modifier = Modifier
                         .fillMaxWidth()
                 )
@@ -81,11 +92,22 @@ fun LoginDialog(
                     )
                     Text("Remember Credentials")
                 }
-                Button(
-                    onClick=onSubmit,
-
+                Row(
+                    horizontalArrangement = Arrangement.End,
+                    modifier = Modifier.fillMaxWidth()
                 ){
-                    Text("Submit")
+                    Button(
+                        onClick = onExit,
+                        modifier = Modifier
+                            .padding(end = 16.dp)
+                    ) {
+                        Text("Exit")
+                    }
+                    Button(
+                        onClick = onSubmit
+                    ){
+                        Text("Submit")
+                    }
                 }
             }
         }
