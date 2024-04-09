@@ -72,6 +72,6 @@ dependencies {
     implementation(libs.androidx.lifecycle.viewmodel.compose)
 
     implementation(libs.kotlinx.datetime)
-    implementation("androidx.compose.material:material-icons-extended:1.6.5")
+    implementation(libs.androidx.material.icons.extended)
 
 }

@@ -1,8 +1,6 @@
 package com.example.logintest.dataaccess
 
 import android.content.Context
-import com.example.logintest.utils.Secret
-import kotlinx.coroutines.runBlocking
 import java.time.LocalDateTime
 
 class CredentialManager(
@@ -33,11 +31,15 @@ class CredentialManager(
             }
         }
         // saved creds are no good
-        while(token == null){
+        while(token.isNullOrBlank() ){
             creds = getNewCreds()
             token = getNewToken(creds)
-            if(!token.isNullOrBlank() && creds.remember){
-                saveCreds(creds)
+            if(!token.isNullOrBlank()){
+                if(creds.remember){
+                    saveCreds(creds)
+                }else {
+                    saveCreds(LoginModel(UserName = "", password = ""))
+                }
             }
         }
         return token

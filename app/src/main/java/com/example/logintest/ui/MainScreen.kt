@@ -28,13 +28,13 @@ import com.example.logintest.ui.theme.LoginTestTheme
 
 @Composable
 fun MainScreen(
-    viewModel: MainViewModel = viewModel(MainViewModel::class.java)
+    modifier: Modifier = Modifier
 ){
+    val viewModel = viewModel<MainViewModel>()
     Column(
         verticalArrangement = Arrangement.Top,
         horizontalAlignment = Alignment.CenterHorizontally,
-        modifier = Modifier
-            .fillMaxSize()
+        modifier = modifier.fillMaxSize()
     ){
         Button(onClick = { viewModel.getReminders() }) {
             Text(text = "Click Me", style = typography.bodyMedium)
@@ -46,7 +46,7 @@ fun MainScreen(
                 .fillMaxSize()
         ){
             items(viewModel.reminders) {
-                if(it.reminderText.length > 0){
+                if(it.reminderText.isNotEmpty()){
                     ReminderItem(it)
                 }
             }
@@ -54,7 +54,7 @@ fun MainScreen(
     }
     if(viewModel.showLoginDialog){
         LoginDialog(
-            onDismiss = viewModel::dismissLogin,
+            onDismiss = {  },
             onSubmit = viewModel::submitLogin,
             onExit = viewModel::onExit,
             username = viewModel.credentials.value.UserName,
@@ -78,7 +78,7 @@ private fun ReminderItem(
         modifier = Modifier
             .background(Color.LightGray)
             .fillMaxWidth()
-            .padding(28.dp)
+            .padding(24.dp)
 
     ){
         Text(

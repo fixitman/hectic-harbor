@@ -1,7 +1,10 @@
 package com.example.logintest.ui
 
-import android.graphics.drawable.Icon
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
@@ -26,7 +29,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
-import androidx.compose.ui.text.input.PlatformImeOptions
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
@@ -88,10 +90,10 @@ fun LoginDialog(
                     label = { Text("Password") },
                     singleLine = true,
                     keyboardOptions = KeyboardOptions(
-                        imeAction = ImeAction.Done,
+                        imeAction = ImeAction.Go,
                         keyboardType = KeyboardType.Password,
                         autoCorrect = false),
-                    keyboardActions = KeyboardActions(onDone = {onSubmit()}),
+                    keyboardActions = KeyboardActions(onGo = {onSubmit()}),
                     visualTransformation = if(passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
                     trailingIcon = {
                         val image = if(!passwordVisible) Icons.Filled.Visibility else Icons.Filled.VisibilityOff
@@ -140,6 +142,6 @@ fun LoginDialog(
 
 @Preview
 @Composable
-fun preview(){
+fun Preview(){
     LoginDialog(  )
 }

@@ -11,18 +11,15 @@ import androidx.lifecycle.viewModelScope
 import com.example.logintest.dataaccess.CredentialManager
 import com.example.logintest.dataaccess.LoginModel
 import com.example.logintest.dataaccess.ReminderAPIService
-import com.example.logintest.utils.Secret
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import kotlin.coroutines.CoroutineContext
 import kotlin.system.exitProcess
 
-class MainViewModel(private val application: Application) : AndroidViewModel(application)
+class MainViewModel(application: Application) : AndroidViewModel(application)
 {
 
     private var waiting: Boolean = false
     var reminders = mutableStateListOf<com.example.logintest.dataaccess.Reminder>()
-    var credManager: CredentialManager = CredentialManager(getApplication<Application>().applicationContext) {getCreds()}
+    private var credManager: CredentialManager = CredentialManager(getApplication<Application>().applicationContext) {getCreds()}
     var showLoginDialog by mutableStateOf(false)
     val credentials: MutableState<LoginModel> = mutableStateOf(LoginModel(UserName = "", password = "", remember = false))
 
@@ -40,7 +37,7 @@ class MainViewModel(private val application: Application) : AndroidViewModel(app
         }
     }
 
-    fun getCreds(): LoginModel  {
+    private fun getCreds(): LoginModel  {
 
         showLoginDialog = true
 
@@ -53,22 +50,18 @@ class MainViewModel(private val application: Application) : AndroidViewModel(app
         return ret
     }
 
-    fun submitLogin() {
-        //showLoginDialog = false
-        waiting = false
-
-    }
-
-    fun dismissLogin(){
-
-    }
-
-    fun resetCredentials(){
+    private fun resetCredentials(){
         credentials.value.let{
             it.UserName = ""
             it.password= ""
             it.remember = false
         }
+
+    }
+
+    fun submitLogin() {
+        //showLoginDialog = false
+        waiting = false
 
     }
 
