@@ -59,7 +59,7 @@ fun MainScreen(
             onSubmit = viewModel::submitLogin,
             onExit = viewModel::onExit,
             username = viewModel.credentials.value.UserName,
-            updateUsername =  viewModel::udpadeUser ,
+            updateUsername =  viewModel::updateUser ,
             password = viewModel.credentials.value.password,
             updatePassword = viewModel::updatePassword,
             saveCreds = viewModel.credentials.value.remember,
@@ -71,7 +71,7 @@ fun MainScreen(
 
 @Composable
 private fun ReminderItem(
-    it: Reminder,
+    reminder: Reminder,
     onClick: (Reminder) -> Unit = {}
 ) {
     Card (
@@ -81,11 +81,11 @@ private fun ReminderItem(
             .background(Color.LightGray)
             .fillMaxWidth()
             .padding(24.dp)
-            .clickable { onClick(it) }
+            .clickable { onClick(reminder) }
 
     ){
         Text(
-            text = it.reminderText,
+            text = reminder.reminderText,
             style = typography.headlineMedium,
             textAlign = TextAlign.Center,
             modifier = Modifier
@@ -98,5 +98,9 @@ private fun ReminderItem(
 @Preview(showBackground = true)
 @Composable
 fun GreetingPreview() {
-    LoginTestTheme { ReminderItem(it = Reminder(0,0,"","Something","")) }
+    LoginTestTheme {
+        ReminderItem(
+            reminder = Reminder(reminderText = "Some Text")
+        )
+    }
 }

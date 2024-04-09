@@ -21,7 +21,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application)
 {
 
     private var waiting: Boolean = false
-    var reminders = mutableStateListOf<com.example.logintest.dataaccess.Reminder>()
+    var reminders = mutableStateListOf<Reminder>()
     private var credManager: CredentialManager = CredentialManager(getApplication<Application>().applicationContext) {getCreds()}
     var showLoginDialog by mutableStateOf(false)
     val credentials: MutableState<LoginModel> = mutableStateOf(LoginModel(UserName = "", password = "", remember = false))
@@ -68,7 +68,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application)
 
     }
 
-    fun udpadeUser(s: String) {
+    fun updateUser(s: String) {
         credentials.value = credentials.value.copy(UserName = s)
     }
 

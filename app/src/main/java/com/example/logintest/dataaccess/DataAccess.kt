@@ -1,19 +1,17 @@
 package com.example.logintest.dataaccess
 
 import android.util.Log
-import kotlinx.coroutines.runBlocking
+import com.example.logintest.utils.Strings.TAG
 import okhttp3.Interceptor
 import okhttp3.OkHttpClient
 import okhttp3.Response
+import retrofit2.Call
+import retrofit2.HttpException
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import retrofit2.http.Body
 import retrofit2.http.GET
 import retrofit2.http.POST
-import com.example.logintest.utils.Strings.TAG
-import retrofit2.Call
-import retrofit2.HttpException
-import java.time.LocalDateTime
 
 //Auth
 data class LoginModel(
@@ -75,11 +73,11 @@ class AuthAPIService(){
 
 //Reminders
 data class Reminder(
-    val id: Int,
-    val recurrence: Int,
-    val recurrenceData: String,
-    val reminderText: String,
-    val reminderTime: String
+    val id: Int = -999,
+    val recurrence: Int = 0,
+    val recurrenceData: String = "",
+    val reminderText: String = "",
+    val reminderTime: String = ""
 )
 
 class AuthInterceptor(
