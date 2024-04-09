@@ -56,7 +56,7 @@ fun MainScreen(
     if(viewModel.showLoginDialog){
         LoginDialog(
             onDismiss = {  },
-            onSubmit = viewModel::submitLogin,
+            onSubmit = viewModel::onSubmit,
             onExit = viewModel::onExit,
             username = viewModel.credentials.value.UserName,
             updateUsername =  viewModel::updateUser ,

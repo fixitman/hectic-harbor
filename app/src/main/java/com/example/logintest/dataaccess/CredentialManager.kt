@@ -22,17 +22,16 @@ class CredentialManager(
         if(!token.isNullOrBlank()){
             return token
         }
-        // no saved token (or expired)
-        var creds = getSavedCreds()
-        if(creds != null){
-            token = getNewToken(creds)
-            if(!token.isNullOrBlank()){
-                return token
-            }
+        // no saved token (or expired) get new token with saved creds
+        token = getSavedCreds()?.let{creds ->
+           getNewToken(creds)
+        }
+        if(!token.isNullOrBlank()){
+            return token
         }
         // saved creds are no good
         while(token.isNullOrBlank() ){
-            creds = getNewCreds()
+            val creds = getNewCreds()
             token = getNewToken(creds)
             if(!token.isNullOrBlank()){
                 if(creds.remember){
@@ -56,9 +55,6 @@ class CredentialManager(
     }
 
     private fun getNewCreds(): LoginModel {
-        //TODO("Not yet implemented")
-        //return LoginModel(Secret.USERNAME, Secret.PASSWORD)
-        //return LoginModel(UserName = "wrong", "password")
         return getCredsFunction()
     }
 
@@ -91,9 +87,6 @@ class CredentialManager(
 
     private fun getNewToken(model: LoginModel): String? {
        return  AuthAPIService().login(model)?.token
-
     }
-
-
 
 }

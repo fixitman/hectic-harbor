@@ -26,8 +26,8 @@ data class LoginResponse(
 )
 
 interface AuthAPI{
-    @POST("Account/login")
-    suspend fun login(@Body loginModel:LoginModel): LoginResponse?
+//    @POST("Account/login")
+//    suspend fun login(@Body loginModel:LoginModel): LoginResponse?
 
     @POST("Account/login")
     fun loginCall(@Body loginModel:LoginModel): Call<LoginResponse?>

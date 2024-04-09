@@ -2,7 +2,6 @@ package com.example.logintest.ui
 
 import android.app.Application
 import android.util.Log
-import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
@@ -20,11 +19,11 @@ import kotlin.system.exitProcess
 class MainViewModel(application: Application) : AndroidViewModel(application)
 {
 
-    private var waiting: Boolean = false
+    private var waitingForLogin: Boolean = false
     var reminders = mutableStateListOf<Reminder>()
-    private var credManager: CredentialManager = CredentialManager(getApplication<Application>().applicationContext) {getCreds()}
+    private var credManager = CredentialManager(getApplication<Application>().applicationContext) {getCreds()}
     var showLoginDialog by mutableStateOf(false)
-    val credentials: MutableState<LoginModel> = mutableStateOf(LoginModel(UserName = "", password = "", remember = false))
+    val credentials = mutableStateOf(LoginModel(UserName = "", password = "", remember = false))
 
 
 
@@ -44,8 +43,8 @@ class MainViewModel(application: Application) : AndroidViewModel(application)
 
         showLoginDialog = true
 
-        waiting = true
-        while(waiting){}
+        waitingForLogin = true
+        while(waitingForLogin){}
         showLoginDialog = false
 
         val ret = credentials.value.copy()
@@ -62,12 +61,6 @@ class MainViewModel(application: Application) : AndroidViewModel(application)
 
     }
 
-    fun submitLogin() {
-        //showLoginDialog = false
-        waiting = false
-
-    }
-
     fun updateUser(s: String) {
         credentials.value = credentials.value.copy(UserName = s)
     }
@@ -78,6 +71,10 @@ class MainViewModel(application: Application) : AndroidViewModel(application)
 
     fun updateRemember(b: Boolean) {
         credentials.value = credentials.value.copy(remember = b)
+    }
+
+    fun onSubmit() {
+        waitingForLogin = false
     }
 
     fun onExit() {
