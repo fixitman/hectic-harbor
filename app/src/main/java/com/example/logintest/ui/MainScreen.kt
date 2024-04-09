@@ -1,6 +1,7 @@
 package com.example.logintest.ui
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -47,7 +48,7 @@ fun MainScreen(
         ){
             items(viewModel.reminders) {
                 if(it.reminderText.isNotEmpty()){
-                    ReminderItem(it)
+                    ReminderItem(it, viewModel::onReminderClick)
                 }
             }
         }
@@ -70,7 +71,8 @@ fun MainScreen(
 
 @Composable
 private fun ReminderItem(
-    it: Reminder
+    it: Reminder,
+    onClick: (Reminder) -> Unit = {}
 ) {
     Card (
         shape = RoundedCornerShape(8.dp),
@@ -79,6 +81,7 @@ private fun ReminderItem(
             .background(Color.LightGray)
             .fillMaxWidth()
             .padding(24.dp)
+            .clickable { onClick(it) }
 
     ){
         Text(
@@ -95,5 +98,5 @@ private fun ReminderItem(
 @Preview(showBackground = true)
 @Composable
 fun GreetingPreview() {
-    LoginTestTheme { ReminderItem(it = Reminder(0,0,"","Something",""))}
+    LoginTestTheme { ReminderItem(it = Reminder(0,0,"","Something","")) }
 }

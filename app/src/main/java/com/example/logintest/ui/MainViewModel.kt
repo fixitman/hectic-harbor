@@ -1,6 +1,7 @@
 package com.example.logintest.ui
 
 import android.app.Application
+import android.util.Log
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
@@ -10,7 +11,9 @@ import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.logintest.dataaccess.CredentialManager
 import com.example.logintest.dataaccess.LoginModel
+import com.example.logintest.dataaccess.Reminder
 import com.example.logintest.dataaccess.ReminderAPIService
+import com.example.logintest.utils.Strings.TAG
 import kotlinx.coroutines.launch
 import kotlin.system.exitProcess
 
@@ -79,6 +82,10 @@ class MainViewModel(application: Application) : AndroidViewModel(application)
 
     fun onExit() {
         exitProcess(0)
+    }
+
+    fun onReminderClick(reminder: Reminder) {
+        Log.d(TAG, "onReminderClick: ${reminder.reminderTime}")
     }
 
 
