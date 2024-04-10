@@ -32,7 +32,7 @@ import com.example.logintest.ui.theme.LoginTestTheme
 
 @Composable
 fun MainScreen(
-    onNavigateToOther: () -> Unit,
+    onNavigateToOther: (Int) -> Unit,
     modifier: Modifier = Modifier
 ){
     val viewModel = viewModel<MainViewModel>()
@@ -68,7 +68,7 @@ fun MainScreen(
             ) {
                 items(viewModel.reminders) {
                     if (it.reminderText.isNotEmpty()) {
-                        ReminderItem(it, viewModel::onReminderClick)
+                        ReminderItem(it, onNavigateToOther)
                     }
                 }
             }
@@ -95,7 +95,7 @@ fun MainScreen(
 @Composable
 private fun ReminderItem(
     reminder: Reminder,
-    onClick: (Reminder) -> Unit = {}
+    onNavigateToOther: (Int) -> Unit
 ) {
     Card (
         shape = RoundedCornerShape(8.dp),
@@ -104,11 +104,11 @@ private fun ReminderItem(
             .background(Color.Transparent)
             .fillMaxWidth()
             .padding(24.dp)
-            .clickable { onClick(reminder) }
+            .clickable { onNavigateToOther(reminder.id) }
 
     ){
         Text(
-            text = reminder.reminderText,
+            text = "${reminder.reminderText} ${reminder.id}",
             style = typography.headlineMedium,
             textAlign = TextAlign.Center,
             modifier = Modifier
@@ -124,7 +124,7 @@ private fun ReminderItem(
 fun GreetingPreview() {
     LoginTestTheme {
         ReminderItem(
-            reminder = Reminder(reminderText = "Some Text")
+            reminder = Reminder(reminderText = "Some Text"),{}
         )
     }
 }
