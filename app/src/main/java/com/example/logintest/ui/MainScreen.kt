@@ -13,12 +13,11 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.MaterialTheme.colorScheme
 import androidx.compose.material3.MaterialTheme.typography
-import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -32,6 +31,7 @@ import com.example.logintest.ui.theme.LoginTestTheme
 
 @Composable
 fun MainScreen(
+    onNavigateToOther: () -> Unit,
     modifier: Modifier = Modifier
 ){
     val viewModel = viewModel<MainViewModel>()
@@ -41,9 +41,12 @@ fun MainScreen(
         horizontalAlignment = Alignment.CenterHorizontally,
         modifier = modifier.fillMaxSize()
     ) {
-        Button(onClick = { viewModel.getReminders() }) {
-            Text(text = "Click Me", style = typography.bodyMedium)
-        }
+//        Button(onClick = {
+//            viewModel.getReminders()
+//            onNavigateToOther()
+//        }) {
+//            Text(text = "Click Me", style = typography.bodyMedium)
+//        }
         LazyColumn(
             verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally,

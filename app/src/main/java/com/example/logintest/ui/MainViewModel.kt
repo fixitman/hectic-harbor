@@ -13,6 +13,7 @@ import com.example.logintest.dataaccess.LoginModel
 import com.example.logintest.dataaccess.Reminder
 import com.example.logintest.dataaccess.ReminderAPIService
 import com.example.logintest.utils.Strings.TAG
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlin.system.exitProcess
 
@@ -24,6 +25,10 @@ class MainViewModel(application: Application) : AndroidViewModel(application)
     private var credManager = CredentialManager(getApplication<Application>().applicationContext) {getCreds()}
     var showLoginDialog by mutableStateOf(false)
     val credentials = mutableStateOf(LoginModel(UserName = "", password = "", remember = false))
+
+    init {
+        getReminders()
+    }
 
 
 
@@ -41,7 +46,9 @@ class MainViewModel(application: Application) : AndroidViewModel(application)
 
     private fun getCreds(): LoginModel  {
 
-        showLoginDialog = true
+        viewModelScope.launch(Dispatchers.Main) {
+             showLoginDialog = true
+        }
 
         waitingForLogin = true
         while(waitingForLogin){}
