@@ -17,31 +17,34 @@ class CredentialManager(
     }
 
     fun getToken() : String{
-        // try to use saved token
-        var token = getSavedToken()
-        if(!token.isNullOrBlank()){
-            return token
-        }
-        // no saved token (or expired) get new token with saved creds
-        token = getSavedCreds()?.let{creds ->
-           getNewToken(creds)
-        }
-        if(!token.isNullOrBlank()){
-            return token
-        }
-        // saved creds are no good
-        while(token.isNullOrBlank() ){
-            val creds = getNewCreds()
-            token = getNewToken(creds)
+        try {// try to use saved token
+            var token = getSavedToken()
             if(!token.isNullOrBlank()){
-                if(creds.remember){
-                    saveCreds(creds)
-                }else {
-                    saveCreds(LoginModel(UserName = "", password = ""))
+                return token
+            }
+            // no saved token (or expired) get new token with saved creds
+            token = getSavedCreds()?.let{creds ->
+               getNewToken(creds)
+            }
+            if(!token.isNullOrBlank()){
+                return token
+            }
+            // saved creds are no good
+            while(token.isNullOrBlank() ){
+                val creds = getNewCreds()
+                token = getNewToken(creds)
+                if(!token.isNullOrBlank()){
+                    if(creds.remember){
+                        saveCreds(creds)
+                    }else {
+                        saveCreds(LoginModel(UserName = "", password = ""))
+                    }
                 }
             }
+            return token
+        } catch (e: Exception) {
+            TODO("Not yet implemented")
         }
-        return token
 
     }
 

@@ -14,7 +14,9 @@ import com.example.logintest.dataaccess.Reminder
 import com.example.logintest.dataaccess.ReminderAPIService
 import com.example.logintest.utils.Strings.TAG
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import kotlin.system.exitProcess
 
 class MainViewModel(application: Application) : AndroidViewModel(application)
@@ -24,16 +26,17 @@ class MainViewModel(application: Application) : AndroidViewModel(application)
     var reminders = mutableStateListOf<Reminder>()
     private var credManager = CredentialManager(getApplication<Application>().applicationContext) {getCreds()}
     var showLoginDialog by mutableStateOf(false)
+    var isLoading: Boolean  by mutableStateOf(true)
     val credentials = mutableStateOf(LoginModel(UserName = "", password = "", remember = false))
 
     init {
         getReminders()
     }
 
-
-
     fun getReminders(){
         viewModelScope.launch {
+            withContext(Dispatchers.Main) {isLoading = true}
+
             val fetchedReminders  = ReminderAPIService(credManager).getAllReminders()
             if(fetchedReminders.isNotEmpty()){
                 reminders.clear()
@@ -41,6 +44,8 @@ class MainViewModel(application: Application) : AndroidViewModel(application)
                     reminders.add(it)
                 }
             }
+
+            withContext(Dispatchers.Main) {isLoading = false}
         }
     }
 
