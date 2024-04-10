@@ -13,7 +13,10 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.MaterialTheme.colorScheme
 import androidx.compose.material3.MaterialTheme.typography
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -32,11 +35,12 @@ fun MainScreen(
     modifier: Modifier = Modifier
 ){
     val viewModel = viewModel<MainViewModel>()
+
     Column(
         verticalArrangement = Arrangement.Top,
         horizontalAlignment = Alignment.CenterHorizontally,
         modifier = modifier.fillMaxSize()
-    ){
+    ) {
         Button(onClick = { viewModel.getReminders() }) {
             Text(text = "Click Me", style = typography.bodyMedium)
         }
@@ -45,27 +49,30 @@ fun MainScreen(
             horizontalAlignment = Alignment.CenterHorizontally,
             modifier = Modifier
                 .fillMaxSize()
-        ){
+                .background(colorScheme.primary)
+        ) {
             items(viewModel.reminders) {
-                if(it.reminderText.isNotEmpty()){
+                if (it.reminderText.isNotEmpty()) {
                     ReminderItem(it, viewModel::onReminderClick)
                 }
             }
         }
     }
-    if(viewModel.showLoginDialog){
+
+    if (viewModel.showLoginDialog) {
         LoginDialog(
-            onDismiss = {  },
+            onDismiss = { },
             onSubmit = viewModel::onSubmit,
             onExit = viewModel::onExit,
             username = viewModel.credentials.value.UserName,
-            updateUsername =  viewModel::updateUser ,
+            updateUsername = viewModel::updateUser,
             password = viewModel.credentials.value.password,
             updatePassword = viewModel::updatePassword,
             saveCreds = viewModel.credentials.value.remember,
             updateSaveCreds = viewModel::updateRemember,
         )
     }
+
 
 }
 
@@ -78,7 +85,7 @@ private fun ReminderItem(
         shape = RoundedCornerShape(8.dp),
         elevation = CardDefaults.elevatedCardElevation(),
         modifier = Modifier
-            .background(Color.LightGray)
+            .background(Color.Transparent)
             .fillMaxWidth()
             .padding(24.dp)
             .clickable { onClick(reminder) }
@@ -89,13 +96,14 @@ private fun ReminderItem(
             style = typography.headlineMedium,
             textAlign = TextAlign.Center,
             modifier = Modifier
+                .background(colorScheme.secondaryContainer)
                 .padding(16.dp)
                 .fillMaxWidth()
         )
     }
 }
 
-@Preview(showBackground = true)
+@Preview(showBackground = false)
 @Composable
 fun GreetingPreview() {
     LoginTestTheme {
