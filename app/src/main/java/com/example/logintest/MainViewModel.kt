@@ -1,4 +1,4 @@
-package com.example.logintest.ui
+package com.example.logintest
 
 import android.app.Application
 import android.util.Log
@@ -14,7 +14,6 @@ import com.example.logintest.dataaccess.Reminder
 import com.example.logintest.dataaccess.ReminderAPIService
 import com.example.logintest.utils.Strings.TAG
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import kotlin.system.exitProcess
