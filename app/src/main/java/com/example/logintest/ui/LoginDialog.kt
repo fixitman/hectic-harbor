@@ -20,12 +20,15 @@ import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
@@ -58,6 +61,10 @@ fun LoginDialog(
           shape = RoundedCornerShape(16.dp),
 
         ){
+            val focusRequester = remember {FocusRequester()}
+            LaunchedEffect(Unit){
+                focusRequester.requestFocus()
+            }
             Column(
                 verticalArrangement = Arrangement.Center,
                 horizontalAlignment = Alignment.CenterHorizontally,
@@ -82,6 +89,7 @@ fun LoginDialog(
                         keyboardType = KeyboardType.Password),
                     modifier = Modifier
                         .fillMaxWidth()
+                        .focusRequester(focusRequester)
                 )
                 TextField(
                     modifier = Modifier.fillMaxWidth(),
