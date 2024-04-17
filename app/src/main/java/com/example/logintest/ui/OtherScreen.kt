@@ -11,24 +11,32 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.MaterialTheme.colorScheme
+import androidx.compose.material3.SnackbarDuration
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.launch
+
 
 @Composable
 fun OtherScreen(
-        id: Int = -1,
-        onNavigateToMain: () -> Unit = {}
+    modifier: Modifier = Modifier,
+    id: Int = -1,
+    onNavigateToMain: () -> Unit = {},
+    onError: (String) -> Job
 ){
+    val scope = rememberCoroutineScope()
     Column(
 
-        modifier = Modifier.fillMaxSize()
+        modifier = modifier.fillMaxSize()
     ) {
         Box(
-            modifier = Modifier
+            modifier = modifier
                 .fillMaxWidth()
                 .fillMaxHeight(.5f)
                 .padding(8.dp)
@@ -40,24 +48,26 @@ fun OtherScreen(
         ) {
             Text("The Id is $id")
         }
+
         Box(
-            modifier = Modifier
+            modifier = modifier
                 .fillMaxWidth()
                 .fillMaxHeight()
                 .background(Color.Red)
                 .padding(16.dp)
                 .background(colorScheme.secondary)
-                .border(BorderStroke(8.dp,Color.Blue))
-
-
+                .border(BorderStroke(8.dp, Color.Blue))
+                .clickable {
+                    onError("$id")
+                }
         ) {
 
         }
     }
 }
 
-@Preview(showBackground = true)
-@Composable
-fun Look(){
-    OtherScreen( )
-}
+//@Preview(showBackground = true)
+//@Composable
+//fun Look(){
+//    OtherScreen(snackbarHostState = null)
+//}

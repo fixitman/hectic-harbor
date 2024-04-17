@@ -18,9 +18,11 @@ import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme.colorScheme
 import androidx.compose.material3.MaterialTheme.typography
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -30,45 +32,24 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.logintest.MainViewModel
 import com.example.logintest.dataaccess.Reminder
-import com.example.logintest.ui.theme.LoginTestTheme
+import kotlinx.coroutines.Job
 
 
 @Composable
 fun MainScreen(
     onNavigateToOther: (Int) -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    onError: (String) -> Job
 ){
     val viewModel = viewModel<MainViewModel>()
+    val scope = rememberCoroutineScope()
 
     Column(
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally,
         modifier = modifier.fillMaxSize()
     ) {
-//        Button(onClick = {
-//            viewModel.getReminders()
-//            //onNavigateToOther()
-//        }) {
-//            Text(text = "Click Me", style = typography.bodyMedium)
-//        }
-
         if(viewModel.isLoading && !viewModel.showLoginDialog){
-//            Surface(
-//                modifier = Modifier
-//                    .fillMaxSize()
-//                    .background(colorScheme.surface)
-//            ) {
-//                CircularProgressIndicator(
-//                    strokeWidth = 8.dp,
-//                    modifier = Modifier
-//                        .width(64.dp)
-//                        .align(Alignment.CenterHorizontally)
-//                )
-//                Text(
-//                    "Loading...",
-//                    modifier = Modifier.padding(top = 24.dp)
-//                )
-//            }
             Surface(
                 modifier = Modifier
                     .fillMaxSize()
@@ -77,7 +58,9 @@ fun MainScreen(
                 Column(
                     verticalArrangement=Arrangement.Center,
                     horizontalAlignment = Alignment.CenterHorizontally,
-                    modifier = Modifier.fillMaxSize().background(Color.Transparent)
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .background(Color.Transparent)
                 ) {
                     CircularProgressIndicator(
                         strokeWidth = 8.dp,
@@ -140,7 +123,9 @@ private fun ReminderItem(
             .background(Color.Transparent)
             .fillMaxWidth()
             .padding(24.dp)
-            .clickable { onNavigateToOther(reminder.id) }
+            .clickable {
+                onNavigateToOther(reminder.id)
+            }
 
     ){
         Text(
@@ -155,15 +140,15 @@ private fun ReminderItem(
     }
 }
 
-@Preview(showBackground = false)
-@Composable
-fun GreetingPreview() {
-    LoginTestTheme {
-        ReminderItem(
-            reminder = Reminder(reminderText = "Some Text"),{}
-        )
-    }
-}
+//@Preview(showBackground = false)
+//@Composable
+//fun GreetingPreview() {
+//    LoginTestTheme {
+//        ReminderItem(
+//            reminder = Reminder(reminderText = "Some Text"),{}
+//        )
+//    }
+//}
 
 @Preview(showBackground = false)
 @Composable
@@ -177,7 +162,9 @@ fun SpinnyPreview() {
             Column(
                 verticalArrangement=Arrangement.Center,
                 horizontalAlignment = Alignment.CenterHorizontally,
-                modifier = Modifier.fillMaxSize().background(Color.Transparent)
+                modifier = Modifier
+                    .fillMaxSize()
+                    .background(Color.Transparent)
             ) {
                 CircularProgressIndicator(
                     strokeWidth = 8.dp,
