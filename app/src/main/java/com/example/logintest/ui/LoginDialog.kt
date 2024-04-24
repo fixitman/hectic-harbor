@@ -54,9 +54,7 @@ fun LoginDialog(
     Dialog(
         onDismissRequest = onDismiss,
     ){
-        var passwordVisible by remember {
-            mutableStateOf(false)
-        }
+
         Card(
           shape = RoundedCornerShape(16.dp),
 
@@ -91,6 +89,7 @@ fun LoginDialog(
                         .fillMaxWidth()
                         .focusRequester(focusRequester)
                 )
+                var passwordVisible by remember { mutableStateOf(false) }
                 TextField(
                     modifier = Modifier.fillMaxWidth(),
                     value = password,

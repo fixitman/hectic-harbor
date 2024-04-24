@@ -18,11 +18,9 @@ import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme.colorScheme
 import androidx.compose.material3.MaterialTheme.typography
-import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -32,51 +30,21 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.logintest.MainViewModel
 import com.example.logintest.dataaccess.Reminder
-import kotlinx.coroutines.Job
 
 
 @Composable
 fun MainScreen(
     onNavigateToOther: (Int) -> Unit,
     modifier: Modifier = Modifier,
-    onError: (String) -> Job
+    viewModel: MainViewModel = viewModel()
 ){
-    val viewModel = viewModel<MainViewModel>()
-    val scope = rememberCoroutineScope()
-
     Column(
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally,
         modifier = modifier.fillMaxSize()
     ) {
         if(viewModel.isLoading && !viewModel.showLoginDialog){
-            Surface(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .background(colorScheme.secondary)
-            ) {
-                Column(
-                    verticalArrangement=Arrangement.Center,
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .background(Color.Transparent)
-                ) {
-                    CircularProgressIndicator(
-                        strokeWidth = 8.dp,
-                        modifier = Modifier
-                            .width(100.dp)
-                            .align(Alignment.CenterHorizontally)
-                    )
-                    Spacer(modifier = Modifier.height(100.dp))
-                    Text(
-                        "Loading...",
-                        style= typography.headlineMedium,
-                        modifier = Modifier
-
-                    )
-                }
-            }
+           LoadingIndicator()
         }else {
             LazyColumn(
                 verticalArrangement = Arrangement.Center,
@@ -107,9 +75,39 @@ fun MainScreen(
             updateSaveCreds = viewModel::updateRemember,
         )
     }
-
-
 }
+
+@Composable
+private fun LoadingIndicator(){
+    Surface(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(colorScheme.secondary)
+    ) {
+        Column(
+            verticalArrangement = Arrangement.Center,
+            horizontalAlignment = Alignment.CenterHorizontally,
+            modifier = Modifier
+                .fillMaxSize()
+            //.background(Color.Transparent)
+        ) {
+            CircularProgressIndicator(
+                strokeWidth = 8.dp,
+                modifier = Modifier
+                    .width(100.dp)
+                    .align(Alignment.CenterHorizontally)
+            )
+            Spacer(modifier = Modifier.height(100.dp))
+            Text(
+                "Loading...",
+                style = typography.headlineMedium,
+                modifier = Modifier
+            )
+        }
+    }
+}
+
+
 
 @Composable
 private fun ReminderItem(
@@ -153,33 +151,31 @@ private fun ReminderItem(
 @Preview(showBackground = false)
 @Composable
 fun SpinnyPreview() {
-
-        Surface(
+    Surface(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(colorScheme.secondary)
+    ) {
+        Column(
+            verticalArrangement=Arrangement.Center,
+            horizontalAlignment = Alignment.CenterHorizontally,
             modifier = Modifier
                 .fillMaxSize()
-                .background(colorScheme.secondary)
+                .background(Color.Transparent)
         ) {
-            Column(
-                verticalArrangement=Arrangement.Center,
-                horizontalAlignment = Alignment.CenterHorizontally,
+            CircularProgressIndicator(
+                strokeWidth = 8.dp,
                 modifier = Modifier
-                    .fillMaxSize()
-                    .background(Color.Transparent)
-            ) {
-                CircularProgressIndicator(
-                    strokeWidth = 8.dp,
-                    modifier = Modifier
-                        .width(200.dp)
-                        .align(Alignment.CenterHorizontally)
-                )
-                Spacer(modifier = Modifier.height(100.dp))
-                Text(
-                    "Loading...",
-                    style= typography.headlineMedium,
-                    modifier = Modifier
+                    .width(200.dp)
+                    .align(Alignment.CenterHorizontally)
+            )
+            Spacer(modifier = Modifier.height(100.dp))
+            Text(
+                "Loading...",
+                style= typography.headlineMedium,
+                modifier = Modifier
 
-                )
-            }
+            )
         }
-
+    }
 }

@@ -11,16 +11,13 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.MaterialTheme.colorScheme
-import androidx.compose.material3.SnackbarDuration
-import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.launch
+import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.logintest.MainViewModel
 
 
 @Composable
@@ -28,11 +25,10 @@ fun OtherScreen(
     modifier: Modifier = Modifier,
     id: Int = -1,
     onNavigateToMain: () -> Unit = {},
-    onError: (String) -> Job
+    viewModel: MainViewModel = viewModel(),
+    errorMgr: ErrorManager
 ){
-    val scope = rememberCoroutineScope()
     Column(
-
         modifier = modifier.fillMaxSize()
     ) {
         Box(
@@ -56,10 +52,11 @@ fun OtherScreen(
                 .background(Color.Red)
                 .padding(16.dp)
                 .background(colorScheme.secondary)
-                .border(BorderStroke(8.dp, Color.Blue))
+                .border(BorderStroke(16.dp, Color.Blue))
                 .clickable {
-                    onError("$id")
+                    errorMgr.showError("clicked!")
                 }
+
         ) {
 
         }

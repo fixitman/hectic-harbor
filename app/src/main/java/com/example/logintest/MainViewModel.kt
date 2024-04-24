@@ -23,10 +23,12 @@ class MainViewModel(application: Application) : AndroidViewModel(application)
 
     private var waitingForLogin: Boolean = false
     var reminders = mutableStateListOf<Reminder>()
-    private var credManager = CredentialManager(getApplication<Application>().applicationContext) {getCreds()}
+    //private var credManager = CredentialManager(getApplication<Application>().applicationContext) //{getCreds()}
     var showLoginDialog by mutableStateOf(false)
     var isLoading: Boolean  by mutableStateOf(true)
     val credentials = mutableStateOf(LoginModel(UserName = "", password = "", remember = false))
+    val reminderService = ReminderAPIService(token = "")
+
 
     init {
         getReminders()
@@ -36,7 +38,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application)
         viewModelScope.launch {
             withContext(Dispatchers.Main) {isLoading = true}
 
-            val fetchedReminders  = ReminderAPIService(credManager).getAllReminders()
+            val fetchedReminders  = reminderService.getAllReminders()
             if(fetchedReminders.isNotEmpty()){
                 reminders.clear()
                 fetchedReminders.forEach {
@@ -48,29 +50,29 @@ class MainViewModel(application: Application) : AndroidViewModel(application)
         }
     }
 
-    private fun getCreds(): LoginModel  {
+//    private fun getCreds(): LoginModel  {
+//
+//        viewModelScope.launch(Dispatchers.Main) {
+//             showLoginDialog = true
+//        }
+//
+//        waitingForLogin = true
+//        while(waitingForLogin){}
+//        showLoginDialog = false
+//
+//        val ret = credentials.value.copy()
+//        resetCredentials()
+//        return ret
+//    }
 
-        viewModelScope.launch(Dispatchers.Main) {
-             showLoginDialog = true
-        }
-
-        waitingForLogin = true
-        while(waitingForLogin){}
-        showLoginDialog = false
-
-        val ret = credentials.value.copy()
-        resetCredentials()
-        return ret
-    }
-
-    private fun resetCredentials(){
-        credentials.value.let{
-            it.UserName = ""
-            it.password= ""
-            it.remember = false
-        }
-
-    }
+//    private fun resetCredentials(){
+//        credentials.value.let{
+//            it.UserName = ""
+//            it.password= ""
+//            it.remember = false
+//        }
+//
+//    }
 
     fun updateUser(s: String) {
         credentials.value = credentials.value.copy(UserName = s)
@@ -94,6 +96,11 @@ class MainViewModel(application: Application) : AndroidViewModel(application)
 
     fun onReminderClick(reminder: Reminder) {
         Log.d(TAG, "onReminderClick: ${reminder.reminderTime}")
+    }
+
+    suspend fun getReminder(id: Int): Reminder? {
+        return reminderService.getReminder(id)
+
     }
 
 

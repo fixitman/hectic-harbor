@@ -5,7 +5,7 @@ import java.time.LocalDateTime
 
 class CredentialManager(
     private val ctx: Context,
-    private val getCredsFunction : () -> LoginModel
+//    private val getCredsFunction : () -> LoginModel
 ) {
     companion object{
         private const val CREDS: String = "CREDENTIALS"
@@ -16,7 +16,7 @@ class CredentialManager(
         private const val EXPIRATION: String = "EXPIRATION"
     }
 
-    fun getToken() : String{
+    fun getToken() : String?{
         try {// try to use saved token
             var token = getSavedToken()
             if(!token.isNullOrBlank()){
@@ -30,17 +30,17 @@ class CredentialManager(
                 return token
             }
             // saved creds are no good
-            while(token.isNullOrBlank() ){
-                val creds = getNewCreds()
-                token = getNewToken(creds)
-                if(!token.isNullOrBlank()){
-                    if(creds.remember){
-                        saveCreds(creds)
-                    }else {
-                        saveCreds(LoginModel(UserName = "", password = ""))
-                    }
-                }
-            }
+//            while(token.isNullOrBlank() ){
+//                val creds = getNewCreds()
+//                token = getNewToken(creds)
+//                if(!token.isNullOrBlank()){
+//                    if(creds.remember){
+//                        saveCreds(creds)
+//                    }else {
+//                        saveCreds(LoginModel(UserName = "", password = ""))
+//                    }
+//                }
+//            }
             return token
         } catch (e: Exception) {
             TODO("Not yet implemented")
@@ -57,9 +57,9 @@ class CredentialManager(
         }
     }
 
-    private fun getNewCreds(): LoginModel {
-        return getCredsFunction()
-    }
+//    private fun getNewCreds(): LoginModel {
+//        return getCredsFunction()
+//    }
 
     private fun getSavedCreds(): LoginModel? {
 
