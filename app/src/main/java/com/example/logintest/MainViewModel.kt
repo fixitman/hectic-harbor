@@ -20,6 +20,7 @@ import kotlin.system.exitProcess
 class MainViewModel(application: Application) : AndroidViewModel(application)
 {
 
+    var currentReminder: Reminder? = null
     var token: String? = null
     private var waitingForCredsDlgInput: Boolean = false
     var reminders = mutableStateListOf<Reminder>()
@@ -94,13 +95,16 @@ class MainViewModel(application: Application) : AndroidViewModel(application)
     }
 
     suspend fun getReminder(id: Int): Reminder? {
-        return reminderService.getReminder(id)
+        return reminderService.getReminder(id).also {
+            currentReminder = it
+        }
 
     }
 
     fun updateToken(token: String?) {
         this.token = token
         if(token != null){
+            Log.d(TAG, "updateToken: ")
             reminderService = ReminderAPIService(token)
         }
     }

@@ -85,9 +85,8 @@ class CredentialManager(
     private fun getSavedToken(): String? {
         val savedToken = ctx.getSharedPreferences(JWT, Context.MODE_PRIVATE)
         savedToken?.let{
-            val expString = savedToken.getString(EXPIRATION, LocalDateTime.now().minusHours(1).toString())
+            val expString = savedToken.getString(EXPIRATION, ZonedDateTime.now().minusHours(1).toString())
             val exp: ZonedDateTime = ZonedDateTime.parse(expString)
-            val x = ZonedDateTime.now()
             if(exp.isAfter(ZonedDateTime.now().plusHours(1))){
                 val tokenString = savedToken.getString(TOKEN,"")
                 if(!tokenString.isNullOrBlank()){

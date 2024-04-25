@@ -33,12 +33,14 @@ class MainActivity : ComponentActivity() {
                 val snackbarHostState = remember {SnackbarHostState()}
                 val navController = rememberNavController()
                 val scope = rememberCoroutineScope()
+                val viewModel: MainViewModel = viewModel()
                 Scaffold(
                     snackbarHost = { SnackbarHost(hostState = snackbarHostState)}
                 ) { paddingValues ->
                     NavHost(navController, startDestination = "Main",){
                         composable(route = "Main"){
                             MainScreen(
+                                viewModel = viewModel,
                                 modifier = Modifier.padding(paddingValues),
                                 onNavigateToOther = {id -> navController.navigate("AddEdit/$id") }
                             )
@@ -48,7 +50,7 @@ class MainActivity : ComponentActivity() {
                             arguments = listOf(navArgument("id") {type = NavType.IntType} )
                         ){ backStack ->
                             val id = backStack.arguments?.getInt("id")?: -1
-                            AddEditReminder(id = id)
+                            AddEditReminder(id = id, viewModel = viewModel)
                         }
                         composable(
                             route = "Other/{id}",

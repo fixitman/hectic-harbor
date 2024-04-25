@@ -1,6 +1,7 @@
 package com.example.logintest.ui
 
 import android.content.Context
+import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -39,6 +40,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.logintest.MainViewModel
 import com.example.logintest.dataaccess.CredentialManager
 import com.example.logintest.dataaccess.Reminder
+import com.example.logintest.utils.Strings.TAG
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
@@ -52,8 +54,8 @@ fun MainScreen(
     var showAuth by remember { mutableStateOf(true)}
     if(showAuth){
         AuthScreen(viewModel = viewModel, context = LocalContext.current, onDone = { token ->
-                viewModel.updateToken(token)
-                showAuth = false
+            viewModel.updateToken(token)
+            showAuth = false
             })
     }else{
         MainContent(modifier,viewModel,onNavigateToOther)
@@ -83,8 +85,10 @@ fun AuthScreen(onDone: (String?) -> Unit, context: Context, viewModel: MainViewM
         var token: String? = null
         withContext(Dispatchers.IO){
             token = credMgr.getToken()
+            withContext(Dispatchers.Main){
+                onDone(token)
+            }
         }
-        onDone(token)
     }
     Column(modifier = Modifier.fillMaxSize(), verticalArrangement = Arrangement.Center, horizontalAlignment = Alignment.CenterHorizontally) {
         Text(
