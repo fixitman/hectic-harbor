@@ -28,6 +28,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -51,7 +52,7 @@ fun MainScreen(
     modifier: Modifier = Modifier,
     viewModel: MainViewModel = viewModel()
 ){
-    var showAuth by remember { mutableStateOf(true)}
+    var showAuth by rememberSaveable { mutableStateOf(true)}
     if(showAuth){
         AuthScreen(viewModel = viewModel, context = LocalContext.current, onDone = { token ->
             viewModel.updateToken(token)
