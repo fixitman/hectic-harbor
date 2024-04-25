@@ -8,7 +8,6 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.logintest.dataaccess.CredentialManager
 import com.example.logintest.dataaccess.LoginModel
 import com.example.logintest.dataaccess.Reminder
 import com.example.logintest.dataaccess.ReminderAPIService
@@ -21,21 +20,17 @@ import kotlin.system.exitProcess
 class MainViewModel(application: Application) : AndroidViewModel(application)
 {
 
-    private var waitingForLogin: Boolean = false
+    var token: String? = null
+    private var waitingForCredsDlgInput: Boolean = false
     var reminders = mutableStateListOf<Reminder>()
-    //private var credManager = CredentialManager(getApplication<Application>().applicationContext) //{getCreds()}
     var showLoginDialog by mutableStateOf(false)
     var isLoading: Boolean  by mutableStateOf(true)
     val credentials = mutableStateOf(LoginModel(UserName = "", password = "", remember = false))
-    val reminderService = ReminderAPIService(token = "")
+    lateinit var reminderService: ReminderAPIService
 
-
-    init {
-        getReminders()
-    }
 
     fun getReminders(){
-        viewModelScope.launch {
+        viewModelScope.launch(Dispatchers.IO) {
             withContext(Dispatchers.Main) {isLoading = true}
 
             val fetchedReminders  = reminderService.getAllReminders()
@@ -50,29 +45,29 @@ class MainViewModel(application: Application) : AndroidViewModel(application)
         }
     }
 
-//    private fun getCreds(): LoginModel  {
-//
-//        viewModelScope.launch(Dispatchers.Main) {
-//             showLoginDialog = true
-//        }
-//
-//        waitingForLogin = true
-//        while(waitingForLogin){}
-//        showLoginDialog = false
-//
-//        val ret = credentials.value.copy()
-//        resetCredentials()
-//        return ret
-//    }
+    fun askForCreds(): LoginModel  {
 
-//    private fun resetCredentials(){
-//        credentials.value.let{
-//            it.UserName = ""
-//            it.password= ""
-//            it.remember = false
-//        }
-//
-//    }
+        viewModelScope.launch(Dispatchers.Main) {
+             showLoginDialog = true
+        }
+
+        waitingForCredsDlgInput = true
+        while(waitingForCredsDlgInput){}
+        showLoginDialog = false
+
+        val ret = credentials.value.copy()
+        resetCredentials()
+        return ret
+    }
+
+    private fun resetCredentials(){
+        credentials.value.let{
+            it.UserName = ""
+            it.password= ""
+            it.remember = false
+        }
+
+    }
 
     fun updateUser(s: String) {
         credentials.value = credentials.value.copy(UserName = s)
@@ -87,7 +82,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application)
     }
 
     fun onSubmit() {
-        waitingForLogin = false
+        waitingForCredsDlgInput = false
     }
 
     fun onExit() {
@@ -101,6 +96,13 @@ class MainViewModel(application: Application) : AndroidViewModel(application)
     suspend fun getReminder(id: Int): Reminder? {
         return reminderService.getReminder(id)
 
+    }
+
+    fun updateToken(token: String?) {
+        this.token = token
+        if(token != null){
+            reminderService = ReminderAPIService(token)
+        }
     }
 
 

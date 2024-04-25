@@ -2,10 +2,11 @@ package com.example.logintest.dataaccess
 
 import android.content.Context
 import java.time.LocalDateTime
+import java.time.ZonedDateTime
 
 class CredentialManager(
     private val ctx: Context,
-//    private val getCredsFunction : () -> LoginModel
+    private val askForCreds : () -> LoginModel
 ) {
     companion object{
         private const val CREDS: String = "CREDENTIALS"
@@ -29,21 +30,21 @@ class CredentialManager(
             if(!token.isNullOrBlank()){
                 return token
             }
-            // saved creds are no good
-//            while(token.isNullOrBlank() ){
-//                val creds = getNewCreds()
-//                token = getNewToken(creds)
-//                if(!token.isNullOrBlank()){
-//                    if(creds.remember){
-//                        saveCreds(creds)
-//                    }else {
-//                        saveCreds(LoginModel(UserName = "", password = ""))
-//                    }
-//                }
-//            }
+             //saved creds are no good
+            while(token.isNullOrBlank() ){
+                val creds = getNewCredsFromUser()
+                token = getNewToken(creds)
+                if(!token.isNullOrBlank()){
+                    if(creds.remember){
+                        saveCreds(creds)
+                    }else {
+                        saveCreds(LoginModel(UserName = "", password = ""))
+                    }
+                }
+            }
             return token
         } catch (e: Exception) {
-            TODO("Not yet implemented")
+            return null
         }
 
     }
@@ -57,12 +58,20 @@ class CredentialManager(
         }
     }
 
-//    private fun getNewCreds(): LoginModel {
-//        return getCredsFunction()
-//    }
+    private fun saveToken(response: LoginResponse) {
+        ctx.getSharedPreferences(JWT, Context.MODE_PRIVATE)?.run {
+            edit()
+                .putString(TOKEN,response.token)
+                .putString(EXPIRATION, response.expiration)
+                .apply()
+        }
+    }
+
+    private fun getNewCredsFromUser(): LoginModel {
+        return askForCreds()
+    }
 
     private fun getSavedCreds(): LoginModel? {
-
         ctx.getSharedPreferences(CREDS, Context.MODE_PRIVATE)?.run{
             val user = getString(USER,"")
             if(!user.isNullOrBlank()){
@@ -77,8 +86,9 @@ class CredentialManager(
         val savedToken = ctx.getSharedPreferences(JWT, Context.MODE_PRIVATE)
         savedToken?.let{
             val expString = savedToken.getString(EXPIRATION, LocalDateTime.now().minusHours(1).toString())
-            val exp: LocalDateTime = LocalDateTime.parse(expString)
-            if(exp.isAfter(LocalDateTime.now())){
+            val exp: ZonedDateTime = ZonedDateTime.parse(expString)
+            val x = ZonedDateTime.now()
+            if(exp.isAfter(ZonedDateTime.now().plusHours(1))){
                 val tokenString = savedToken.getString(TOKEN,"")
                 if(!tokenString.isNullOrBlank()){
                     return tokenString
@@ -88,8 +98,12 @@ class CredentialManager(
         return null
     }
 
-    private fun getNewToken(model: LoginModel): String? {
-       return  AuthAPIService().login(model)?.token
+    private fun getNewToken(creds: LoginModel): String? {
+       return AuthAPIService().login(creds)?.let { loginResponse ->
+           saveToken(loginResponse)
+           loginResponse.token
+       }
+
     }
 
 }
