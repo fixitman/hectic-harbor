@@ -15,23 +15,22 @@ import com.example.logintest.MainViewModel
 import com.example.logintest.utils.Strings.TAG
 
 @Composable
-fun AddEditReminder(
+fun AddEditReminderScreen(
     id: Int,
     viewModel: MainViewModel = viewModel()
 ) {
-
     LaunchedEffect(key1 = id) {
         viewModel.getReminder(id)
         Log.d(TAG, "AddEditReminder: ${viewModel.currentReminder}")
     }
     Column(
-        verticalArrangement = Arrangement.Center,
+        verticalArrangement = Arrangement.Top,
         horizontalAlignment = Alignment.CenterHorizontally,
         modifier = Modifier.fillMaxSize()
 
     ){
         Text(
-           text = viewModel.currentReminder?.reminderText ?: "",
+           text = viewModel.currentReminder?.reminderText ?: "Empty",
             style = typography.bodyMedium
         )
     }

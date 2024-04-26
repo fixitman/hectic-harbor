@@ -1,7 +1,6 @@
 package com.example.logintest
 
 import android.os.Bundle
-import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.padding
@@ -17,12 +16,11 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
-import com.example.logintest.ui.AddEditReminder
+import com.example.logintest.ui.AddEditReminderScreen
 import com.example.logintest.ui.ErrorManager
 import com.example.logintest.ui.MainScreen
 import com.example.logintest.ui.OtherScreen
 import com.example.logintest.ui.theme.LoginTestTheme
-import com.example.logintest.utils.Strings.TAG
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -50,7 +48,7 @@ class MainActivity : ComponentActivity() {
                             arguments = listOf(navArgument("id") {type = NavType.IntType} )
                         ){ backStack ->
                             val id = backStack.arguments?.getInt("id")?: -1
-                            AddEditReminder(id = id, viewModel = viewModel)
+                            AddEditReminderScreen(id = id, viewModel = viewModel)
                         }
                         composable(
                             route = "Other/{id}",
