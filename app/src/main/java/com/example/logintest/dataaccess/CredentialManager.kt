@@ -1,14 +1,19 @@
 package com.example.logintest.dataaccess
 
 import android.content.Context
+import android.util.Log
+import com.example.logintest.utils.Strings.TAG
 import dagger.hilt.android.qualifiers.ApplicationContext
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import java.time.ZonedDateTime
 import javax.inject.Inject
+import javax.inject.Singleton
 
+@Singleton
 class CredentialManager
     @Inject constructor(
     @ApplicationContext private val ctx: Context,
-
 ) {
     companion object{
         private const val CREDS: String = "CREDENTIALS"
@@ -19,24 +24,33 @@ class CredentialManager
         private const val EXPIRATION: String = "EXPIRATION"
     }
 
-    val observers: List<EventObserver> = listOf()
+    private val _events = MutableSharedFlow<Event>()
+    val events = _events.asSharedFlow()
 
 
 
-    fun getToken() : String?{
+    suspend fun getToken() : String?{
         try {// try to use saved token
             var token = getSavedToken()
             if(!token.isNullOrBlank()){
+                _events.emit(Event.TokenChangedEvent(token))
                 return token
             }
             // no saved token (or expired) get new token with saved creds
-            token = getSavedCreds()?.let{creds ->
-               getNewToken(creds)
+            val creds = getSavedCreds()
+            creds?.let{
+               token = getNewToken(it)
             }
+
             if(!token.isNullOrBlank()){
+                _events.emit(Event.TokenChangedEvent(token!!))
                 return token
             }
              //saved creds are no good
+            _events.emit(Event.InvalidCredentialsEvent)
+
+
+
 //            while(token.isNullOrBlank() ){
 //                val creds = getNewCredsFromUser()
 //                token = getNewToken(creds)
@@ -48,13 +62,14 @@ class CredentialManager
 //                    }
 //                }
 //            }
-            observers.forEach { o ->
-                o.onEvent(Event.InvalidCredentialsEvent)
-            }
 
 
-            return token
+
+
+            return null
         } catch (e: Exception) {
+
+            Log.d(TAG, "getToken: ${e.message}")
             return null
         }
 
@@ -115,13 +130,14 @@ class CredentialManager
        }
     }
 
-    interface EventObserver {
-        fun onEvent(event: Event.InvalidCredentialsEvent)
+    fun updateCreds(value: LoginModel) {
+        saveCreds(value)
     }
+
 
     sealed interface Event{
         data class TokenChangedEvent(val token: String): Event
-        object InvalidCredentialsEvent
+        data object InvalidCredentialsEvent: Event
     }
 
 }

@@ -50,13 +50,13 @@ import kotlinx.coroutines.withContext
 fun MainScreen(
     onNavigateToOther: (Int) -> Unit,
     modifier: Modifier = Modifier,
-    viewModel: MainViewModel = viewModel()
+    viewModel: MainViewModel
 ){
-    var showAuth by rememberSaveable { mutableStateOf(true)}
-    if(showAuth){
-        AuthScreen(viewModel = viewModel, context = LocalContext.current, onDone = { token ->
-            viewModel.updateToken(token)
-            showAuth = false
+
+    if(viewModel.showAuth){
+        AuthScreen(viewModel = viewModel, context = LocalContext.current, onDone = {token->
+
+            viewModel.showAuth = false
             })
     }else{
         MainContent(modifier,viewModel,onNavigateToOther)
@@ -82,16 +82,15 @@ fun MainScreen(
 @Composable
 fun AuthScreen(onDone: (String?) -> Unit, context: Context, viewModel: MainViewModel = viewModel()){
     LaunchedEffect(Unit) {
-        val credMgr = CredentialManager(context, askForCreds = {viewModel.askForCreds()})
+
         var token: String? = null
         withContext(Dispatchers.IO){
-            token = credMgr.getToken()
-            withContext(Dispatchers.Main){
-                onDone(token)
-            }
+            token = viewModel.getToken()
+            //viewModel.updateToken(token)
+
         }
     }
-    Column(modifier = Modifier.fillMaxSize(), verticalArrangement = Arrangement.Center, horizontalAlignment = Alignment.CenterHorizontally) {
+    Column(modifier = Modifier.fillMaxSize(.5f), verticalArrangement = Arrangement.Center, horizontalAlignment = Alignment.CenterHorizontally) {
         Text(
             text = "Authenticating...",
             style = MaterialTheme.typography.titleLarge

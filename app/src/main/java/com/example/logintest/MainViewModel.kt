@@ -9,30 +9,52 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.logintest.dataaccess.CredentialManager
 import com.example.logintest.dataaccess.LoginModel
 import com.example.logintest.dataaccess.Reminder
 import com.example.logintest.dataaccess.ReminderAPIService
 import com.example.logintest.utils.Strings.TAG
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Dispatchers.IO
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
 import kotlin.system.exitProcess
 
 @HiltViewModel
-class MainViewModel @Inject constructor () : ViewModel()
+class MainViewModel @Inject constructor (
+    val credentialManager: CredentialManager
+) : ViewModel()
 {
 
     var currentReminder: Reminder? = null
     var token: String? = null
-    private var waitingForCredsDlgInput: Boolean = false
     var reminders = mutableStateListOf<Reminder>()
     var showLoginDialog by mutableStateOf(false)
+        private set
     var isLoading: Boolean  by mutableStateOf(true)
     val credentials = mutableStateOf(LoginModel(UserName = "", password = "", remember = false))
     lateinit var reminderService: ReminderAPIService
+    var showAuth by mutableStateOf(true)
 
+
+    init {
+        viewModelScope.launch {
+            credentialManager.events.collect{event ->
+                when(event){
+                    is CredentialManager.Event.TokenChangedEvent -> {
+                        updateToken(event.token)
+                        getReminders()
+                    }
+                    CredentialManager.Event.InvalidCredentialsEvent -> {
+                        showLoginDialog = true
+                    }
+                }
+
+            }
+        }
+    }
 
     fun getReminders(){
         viewModelScope.launch(Dispatchers.IO) {
@@ -48,21 +70,6 @@ class MainViewModel @Inject constructor () : ViewModel()
 
             withContext(Dispatchers.Main) {isLoading = false}
         }
-    }
-
-    fun askForCreds(): LoginModel  {
-
-        viewModelScope.launch(Dispatchers.Main) {
-             showLoginDialog = true
-        }
-
-        waitingForCredsDlgInput = true
-        while(waitingForCredsDlgInput){}
-        showLoginDialog = false
-
-        val ret = credentials.value.copy()
-        resetCredentials()
-        return ret
     }
 
     private fun resetCredentials(){
@@ -87,7 +94,14 @@ class MainViewModel @Inject constructor () : ViewModel()
     }
 
     fun onSubmit() {
-        waitingForCredsDlgInput = false
+
+        credentialManager.updateCreds(credentials.value)
+        resetCredentials()
+        showLoginDialog = false
+
+        viewModelScope.launch(IO) {
+            credentialManager.getToken()
+        }
     }
 
     fun onExit() {
@@ -110,7 +124,12 @@ class MainViewModel @Inject constructor () : ViewModel()
         if(token != null){
             Log.d(TAG, "updateToken: ")
             reminderService = ReminderAPIService(token)
+            showAuth = false
         }
+    }
+
+    suspend fun getToken(): String? {
+        return credentialManager.getToken()
     }
 
 
