@@ -21,7 +21,9 @@ import com.example.logintest.ui.ErrorManager
 import com.example.logintest.ui.MainScreen
 import com.example.logintest.ui.OtherScreen
 import com.example.logintest.ui.theme.LoginTestTheme
+import dagger.hilt.android.AndroidEntryPoint
 
+@AndroidEntryPoint
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

@@ -7,17 +7,21 @@ import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.AndroidViewModel
+import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.logintest.dataaccess.LoginModel
 import com.example.logintest.dataaccess.Reminder
 import com.example.logintest.dataaccess.ReminderAPIService
 import com.example.logintest.utils.Strings.TAG
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import javax.inject.Inject
 import kotlin.system.exitProcess
 
-class MainViewModel(application: Application) : AndroidViewModel(application)
+@HiltViewModel
+class MainViewModel @Inject constructor () : ViewModel()
 {
 
     var currentReminder: Reminder? = null

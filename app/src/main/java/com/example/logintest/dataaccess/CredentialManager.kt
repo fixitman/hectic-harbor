@@ -1,12 +1,14 @@
 package com.example.logintest.dataaccess
 
 import android.content.Context
-import java.time.LocalDateTime
+import dagger.hilt.android.qualifiers.ApplicationContext
 import java.time.ZonedDateTime
+import javax.inject.Inject
 
-class CredentialManager(
-    private val ctx: Context,
-    private val askForCreds : () -> LoginModel
+class CredentialManager
+    @Inject constructor(
+    @ApplicationContext private val ctx: Context,
+
 ) {
     companion object{
         private const val CREDS: String = "CREDENTIALS"
@@ -16,6 +18,10 @@ class CredentialManager(
         private const val TOKEN: String = "TOKEN"
         private const val EXPIRATION: String = "EXPIRATION"
     }
+
+    val observers: List<EventObserver> = listOf()
+
+
 
     fun getToken() : String?{
         try {// try to use saved token
@@ -31,17 +37,22 @@ class CredentialManager(
                 return token
             }
              //saved creds are no good
-            while(token.isNullOrBlank() ){
-                val creds = getNewCredsFromUser()
-                token = getNewToken(creds)
-                if(!token.isNullOrBlank()){
-                    if(creds.remember){
-                        saveCreds(creds)
-                    }else {
-                        saveCreds(LoginModel(UserName = "", password = ""))
-                    }
-                }
+//            while(token.isNullOrBlank() ){
+//                val creds = getNewCredsFromUser()
+//                token = getNewToken(creds)
+//                if(!token.isNullOrBlank()){
+//                    if(creds.remember){
+//                        saveCreds(creds)
+//                    }else {
+//                        saveCreds(LoginModel(UserName = "", password = ""))
+//                    }
+//                }
+//            }
+            observers.forEach { o ->
+                o.onEvent(Event.InvalidCredentialsEvent)
             }
+
+
             return token
         } catch (e: Exception) {
             return null
@@ -67,9 +78,9 @@ class CredentialManager(
         }
     }
 
-    private fun getNewCredsFromUser(): LoginModel {
-        return askForCreds()
-    }
+//    private fun getNewCredsFromUser(): LoginModel {
+//        return askForCreds()
+//    }
 
     private fun getSavedCreds(): LoginModel? {
         ctx.getSharedPreferences(CREDS, Context.MODE_PRIVATE)?.run{
@@ -102,7 +113,15 @@ class CredentialManager(
            saveToken(loginResponse)
            loginResponse.token
        }
+    }
 
+    interface EventObserver {
+        fun onEvent(event: Event.InvalidCredentialsEvent)
+    }
+
+    sealed interface Event{
+        data class TokenChangedEvent(val token: String): Event
+        object InvalidCredentialsEvent
     }
 
 }

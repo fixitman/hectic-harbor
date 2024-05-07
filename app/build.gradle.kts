@@ -1,6 +1,8 @@
 plugins {
     alias(libs.plugins.androidApplication)
     alias(libs.plugins.jetbrainsKotlinAndroid)
+    id ("kotlin-kapt")
+    id("com.google.dagger.hilt.android")
 }
 
 android {
@@ -75,4 +77,11 @@ dependencies {
     implementation(libs.kotlinx.datetime)
     implementation(libs.androidx.material.icons.extended)
 
+    implementation(libs.hilt.android)
+    kapt(libs.hilt.android.compiler)
+
+}
+
+kapt {
+    correctErrorTypes = true
 }
