@@ -5,8 +5,10 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
@@ -17,11 +19,10 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.example.logintest.ui.AddEditReminderScreen
-import com.example.logintest.ui.ErrorManager
 import com.example.logintest.ui.MainScreen
-import com.example.logintest.ui.OtherScreen
 import com.example.logintest.ui.theme.LoginTestTheme
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
@@ -29,10 +30,21 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         setContent {
             LoginTestTheme {
-                val snackbarHostState = remember {SnackbarHostState()}
-                val navController = rememberNavController()
-                val scope = rememberCoroutineScope()
                 val viewModel: MainViewModel = viewModel()
+                val navController = rememberNavController()
+                val snackbarHostState = remember {SnackbarHostState()}
+                val scope = rememberCoroutineScope()
+                LaunchedEffect(Unit) {
+                    viewModel.uiEvents.collect{
+                        when(it){
+                            is MainViewModel.UIEvent.SnackbarEvent -> {
+                                scope.launch {
+                                    snackbarHostState.showSnackbar(it.message, duration = SnackbarDuration.Short)
+                                }
+                            }
+                        }
+                    }
+                }
                 Scaffold(
                     snackbarHost = { SnackbarHost(hostState = snackbarHostState)}
                 ) { paddingValues ->
@@ -50,20 +62,6 @@ class MainActivity : ComponentActivity() {
                         ){ backStack ->
                             val id = backStack.arguments?.getInt("id")?: -1
                             AddEditReminderScreen(id = id, viewModel = viewModel)
-                        }
-                        composable(
-                            route = "Other/{id}",
-                            arguments = listOf(navArgument("id") { type = NavType.IntType })
-                        ){ backStackEntry ->
-                            val id = backStackEntry.arguments?.getInt("id") ?: -1
-                            OtherScreen(
-                                modifier = Modifier.padding(paddingValues),
-                                id = id,
-                                onNavigateToMain = {
-                                    navController.popBackStack("Main",false)
-                                },
-                                errorMgr = ErrorManager(snackbarHostState, scope)
-                            )
                         }
                     }
                 }

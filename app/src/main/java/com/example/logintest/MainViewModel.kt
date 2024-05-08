@@ -1,12 +1,10 @@
 package com.example.logintest
 
-import android.app.Application
 import android.util.Log
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
-import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.logintest.dataaccess.CredentialManager
@@ -17,6 +15,8 @@ import com.example.logintest.utils.Strings.TAG
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Dispatchers.IO
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
@@ -29,11 +29,18 @@ class MainViewModel @Inject constructor (
 {
     var currentReminder: Reminder? = null
     var reminders = mutableStateListOf<Reminder>()
+
     var showLoginDialog by mutableStateOf(false)
         private set
-    var showAuth by mutableStateOf(true)
     var isLoading: Boolean  by mutableStateOf(true)
+        private set
+    var showAuthScreen by mutableStateOf(true)
+        private set
     val credentials = mutableStateOf(LoginModel(UserName = "", password = "", remember = false))
+
+    private val _uiEvents = MutableSharedFlow<UIEvent>()
+    val uiEvents = _uiEvents.asSharedFlow()
+
     lateinit var reminderService: ReminderAPIService
 
     init {
@@ -46,6 +53,10 @@ class MainViewModel @Inject constructor (
                     }
                     CredentialManager.Event.InvalidCredentialsEvent -> {
                         showLoginDialog = true
+                    }
+
+                    is CredentialManager.Event.ErrorEvent -> {
+                        _uiEvents.emit(UIEvent.SnackbarEvent(event.message))
                     }
                 }
             }
@@ -106,6 +117,10 @@ class MainViewModel @Inject constructor (
         Log.d(TAG, "onReminderClick: ${reminder.reminderTime}")
     }
 
+    fun onAuthDone() {
+        showAuthScreen = false
+    }
+
     suspend fun getReminder(id: Int): Reminder? {
         return reminderService.getReminder(id).also {
             currentReminder = it
@@ -115,12 +130,24 @@ class MainViewModel @Inject constructor (
     fun updateToken(token: String?) {
         if(token != null){
             reminderService = ReminderAPIService(token)
-            showAuth = false
+            showAuthScreen = false
         }
     }
 
     suspend fun getToken(): String? {
         return credentialManager.getToken()
     }
+
+    fun showSnackbar(message: String){
+        viewModelScope.launch {
+            _uiEvents.emit(UIEvent.SnackbarEvent(message))
+        }
+    }
+
+    sealed interface UIEvent{
+        data class SnackbarEvent(val message: String) : UIEvent
+    }
+
+
 }
 

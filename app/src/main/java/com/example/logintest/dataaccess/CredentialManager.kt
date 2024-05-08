@@ -48,26 +48,11 @@ class CredentialManager
             _events.emit(Event.InvalidCredentialsEvent)
 
 
-
-//            while(token.isNullOrBlank() ){
-//                val creds = getNewCredsFromUser()
-//                token = getNewToken(creds)
-//                if(!token.isNullOrBlank()){
-//                    if(creds.remember){
-//                        saveCreds(creds)
-//                    }else {
-//                        saveCreds(LoginModel(UserName = "", password = ""))
-//                    }
-//                }
-//            }
-
-
-
-
             return null
         } catch (e: Exception) {
 
             Log.d(TAG, "getToken: ${e.message}")
+            _events.emit(Event.ErrorEvent("Error obtaining token: ${e.message}"))
             return null
         }
 
@@ -90,10 +75,6 @@ class CredentialManager
                 .apply()
         }
     }
-
-//    private fun getNewCredsFromUser(): LoginModel {
-//        return askForCreds()
-//    }
 
     private fun getSavedCreds(): LoginModel? {
         ctx.getSharedPreferences(CREDS, Context.MODE_PRIVATE)?.run{
@@ -134,8 +115,10 @@ class CredentialManager
 
 
     sealed interface Event{
+        data class ErrorEvent(val message: String): Event
         data class TokenChangedEvent(val token: String): Event
         data object InvalidCredentialsEvent: Event
+
     }
 
 }

@@ -1,10 +1,9 @@
 package com.example.logintest.ui
 
-import android.content.Context
-import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -25,23 +24,15 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.logintest.MainViewModel
-import com.example.logintest.dataaccess.CredentialManager
 import com.example.logintest.dataaccess.Reminder
-import com.example.logintest.utils.Strings.TAG
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
@@ -52,10 +43,9 @@ fun MainScreen(
     modifier: Modifier = Modifier,
     viewModel: MainViewModel
 ){
-    if(viewModel.showAuth){
-        AuthScreen(viewModel = viewModel, onDone = {token->
-            viewModel.showAuth = false
-        })
+    val credentials = viewModel.credentials.value
+    if(viewModel.showAuthScreen){
+        AuthScreen(viewModel = viewModel)
     }else{
         MainContent(modifier,viewModel,onNavigateToOther)
     }
@@ -65,11 +55,11 @@ fun MainScreen(
             onDismiss = { },
             onSubmit = viewModel::onSubmit,
             onExit = viewModel::onExit,
-            username = viewModel.credentials.value.UserName,
+            username = credentials.UserName,
             updateUsername = viewModel::updateUser,
-            password = viewModel.credentials.value.password,
+            password = credentials.password,
             updatePassword = viewModel::updatePassword,
-            saveCreds = viewModel.credentials.value.remember,
+            saveCreds = credentials.remember,
             updateSaveCreds = viewModel::updateRemember,
         )
     }
@@ -78,7 +68,7 @@ fun MainScreen(
 /*********************************************************************************************************/
 
 @Composable
-fun AuthScreen(onDone: (String?) -> Unit,  viewModel: MainViewModel = viewModel()){
+fun AuthScreen(viewModel: MainViewModel = viewModel()){
     LaunchedEffect(Unit) {
         withContext(Dispatchers.IO){
              viewModel.getToken()
@@ -99,27 +89,24 @@ fun MainContent(modifier: Modifier = Modifier, viewModel: MainViewModel = viewMo
     LaunchedEffect(Unit) {
         viewModel.getReminders()
     }
-    Column(
-        verticalArrangement = Arrangement.Center,
-        horizontalAlignment = Alignment.CenterHorizontally,
+    Box(
         modifier = modifier.fillMaxSize()
-    ) {
-        if(viewModel.isLoading && !viewModel.showLoginDialog){
-            LoadingIndicator()
-        }else {
-            LazyColumn(
-                verticalArrangement = Arrangement.Center,
-                horizontalAlignment = Alignment.CenterHorizontally,
-                modifier = Modifier
-                    .fillMaxSize()
-                    .background(colorScheme.primary)
-            ) {
-                items(viewModel.reminders) {
-                    if (it.reminderText.isNotEmpty()) {
-                        ReminderItem(it, onNavigateToOther)
-                    }
+    ){
+        LazyColumn(
+            verticalArrangement = Arrangement.Center,
+            horizontalAlignment = Alignment.CenterHorizontally,
+            modifier = Modifier
+                .fillMaxSize()
+                .background(colorScheme.primary)
+        ) {
+            items(viewModel.reminders) {
+                if (it.reminderText.isNotEmpty()) {
+                    ReminderItem(it, onNavigateToOther, viewModel)
                 }
             }
+        }
+        if(viewModel.isLoading && !viewModel.showLoginDialog){
+            LoadingIndicator(color = colorScheme.onPrimary, background = Color.Transparent)
         }
     }
 }
@@ -127,39 +114,39 @@ fun MainContent(modifier: Modifier = Modifier, viewModel: MainViewModel = viewMo
 /**********************************************************************************************/
 
 @Composable
-private fun LoadingIndicator(){
-    Surface(
+private fun LoadingIndicator(
+    color: Color = colorScheme.onSurface,
+    background: Color = colorScheme.surface
+){
+    Column(
+        verticalArrangement = Arrangement.Center,
+        horizontalAlignment = Alignment.CenterHorizontally,
         modifier = Modifier
             .fillMaxSize()
-            .background(colorScheme.secondary)
+            .background(background)
     ) {
-        Column(
-            verticalArrangement = Arrangement.Center,
-            horizontalAlignment = Alignment.CenterHorizontally,
+        CircularProgressIndicator(
+            strokeWidth = 8.dp,
+            color = color,
             modifier = Modifier
-                .fillMaxSize()
-            //.background(Color.Transparent)
-        ) {
-            CircularProgressIndicator(
-                strokeWidth = 8.dp,
-                modifier = Modifier
-                    .width(100.dp)
-                    .align(Alignment.CenterHorizontally)
-            )
-            Spacer(modifier = Modifier.height(100.dp))
-            Text(
-                "Loading...",
-                style = typography.headlineMedium,
-                modifier = Modifier
-            )
-        }
+                .width(100.dp)
+                .align(Alignment.CenterHorizontally)
+                .background(Color.Transparent)
+        )
+        Spacer(modifier = Modifier.height(100.dp))
+        Text(
+            "Loading...",
+            style = typography.headlineMedium,
+            color = color,
+            modifier = Modifier
+        )
     }
 }
 
 /***********************************************************************************************/
 
 @Composable
-private fun ReminderItem(reminder: Reminder, onNavigateToOther: (Int) -> Unit) {
+private fun ReminderItem(reminder: Reminder, onNavigateToOther: (Int) -> Unit, viewModel: MainViewModel) {
     Card (
         shape = RoundedCornerShape(8.dp),
         elevation = CardDefaults.elevatedCardElevation(),
@@ -168,9 +155,9 @@ private fun ReminderItem(reminder: Reminder, onNavigateToOther: (Int) -> Unit) {
             .fillMaxWidth()
             .padding(24.dp)
             .clickable {
-                onNavigateToOther(reminder.id)
+                //onNavigateToOther(reminder.id)
+                viewModel.showSnackbar(reminder.toString())
             }
-
     ){
         Text(
             text = reminder.reminderText,
