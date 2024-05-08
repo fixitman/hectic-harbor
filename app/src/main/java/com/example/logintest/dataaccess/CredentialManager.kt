@@ -27,8 +27,6 @@ class CredentialManager
     private val _events = MutableSharedFlow<Event>()
     val events = _events.asSharedFlow()
 
-
-
     suspend fun getToken() : String?{
         try {// try to use saved token
             var token = getSavedToken()

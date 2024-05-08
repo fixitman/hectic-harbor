@@ -27,17 +27,14 @@ class MainViewModel @Inject constructor (
     val credentialManager: CredentialManager
 ) : ViewModel()
 {
-
     var currentReminder: Reminder? = null
-    var token: String? = null
     var reminders = mutableStateListOf<Reminder>()
     var showLoginDialog by mutableStateOf(false)
         private set
+    var showAuth by mutableStateOf(true)
     var isLoading: Boolean  by mutableStateOf(true)
     val credentials = mutableStateOf(LoginModel(UserName = "", password = "", remember = false))
     lateinit var reminderService: ReminderAPIService
-    var showAuth by mutableStateOf(true)
-
 
     init {
         viewModelScope.launch {
@@ -51,7 +48,6 @@ class MainViewModel @Inject constructor (
                         showLoginDialog = true
                     }
                 }
-
             }
         }
     }
@@ -78,7 +74,6 @@ class MainViewModel @Inject constructor (
             it.password= ""
             it.remember = false
         }
-
     }
 
     fun updateUser(s: String) {
@@ -94,7 +89,6 @@ class MainViewModel @Inject constructor (
     }
 
     fun onSubmit() {
-
         credentialManager.updateCreds(credentials.value)
         resetCredentials()
         showLoginDialog = false
@@ -116,13 +110,10 @@ class MainViewModel @Inject constructor (
         return reminderService.getReminder(id).also {
             currentReminder = it
         }
-
     }
 
     fun updateToken(token: String?) {
-        this.token = token
         if(token != null){
-            Log.d(TAG, "updateToken: ")
             reminderService = ReminderAPIService(token)
             showAuth = false
         }
@@ -131,7 +122,5 @@ class MainViewModel @Inject constructor (
     suspend fun getToken(): String? {
         return credentialManager.getToken()
     }
-
-
 }
 

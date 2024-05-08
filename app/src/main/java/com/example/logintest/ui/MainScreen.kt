@@ -52,12 +52,10 @@ fun MainScreen(
     modifier: Modifier = Modifier,
     viewModel: MainViewModel
 ){
-
     if(viewModel.showAuth){
-        AuthScreen(viewModel = viewModel, context = LocalContext.current, onDone = {token->
-
+        AuthScreen(viewModel = viewModel, onDone = {token->
             viewModel.showAuth = false
-            })
+        })
     }else{
         MainContent(modifier,viewModel,onNavigateToOther)
     }
@@ -80,17 +78,13 @@ fun MainScreen(
 /*********************************************************************************************************/
 
 @Composable
-fun AuthScreen(onDone: (String?) -> Unit, context: Context, viewModel: MainViewModel = viewModel()){
+fun AuthScreen(onDone: (String?) -> Unit,  viewModel: MainViewModel = viewModel()){
     LaunchedEffect(Unit) {
-
-        var token: String? = null
         withContext(Dispatchers.IO){
-            token = viewModel.getToken()
-            //viewModel.updateToken(token)
-
+             viewModel.getToken()
         }
     }
-    Column(modifier = Modifier.fillMaxSize(.5f), verticalArrangement = Arrangement.Center, horizontalAlignment = Alignment.CenterHorizontally) {
+    Column(modifier = Modifier.fillMaxSize(), verticalArrangement = Arrangement.Center, horizontalAlignment = Alignment.CenterHorizontally) {
         Text(
             text = "Authenticating...",
             style = MaterialTheme.typography.titleLarge

@@ -24,6 +24,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -54,10 +55,8 @@ fun LoginDialog(
     Dialog(
         onDismissRequest = onDismiss,
     ){
-
         Card(
-          shape = RoundedCornerShape(16.dp),
-
+          shape = RoundedCornerShape(16.dp)
         ){
             val focusRequester = remember {FocusRequester()}
             LaunchedEffect(Unit){
@@ -89,7 +88,7 @@ fun LoginDialog(
                         .fillMaxWidth()
                         .focusRequester(focusRequester)
                 )
-                var passwordVisible by remember { mutableStateOf(false) }
+                var passwordVisible by rememberSaveable { mutableStateOf(false) }
                 TextField(
                     modifier = Modifier.fillMaxWidth(),
                     value = password,
@@ -143,12 +142,5 @@ fun LoginDialog(
                 }
             }
         }
-
     }
-}
-
-@Preview
-@Composable
-fun Preview(){
-    LoginDialog(  )
 }
