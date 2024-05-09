@@ -4,7 +4,6 @@ import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -94,57 +93,18 @@ fun MainContent(modifier: Modifier = Modifier, viewModel: MainViewModel = viewMo
     LaunchedEffect(Unit) {
         viewModel.getReminders()
     }
-    Box(
-        modifier = modifier.fillMaxSize()
-    ){
-        LazyColumn(
-            verticalArrangement = Arrangement.Center,
-            horizontalAlignment = Alignment.CenterHorizontally,
-            modifier = Modifier
-                .fillMaxSize()
-                .background(colorScheme.primary)
-        ) {
-            items(viewModel.reminders) {
-                if (it.reminderText.isNotEmpty()) {
-                    ReminderItem(it, onNavigateToOther, viewModel)
-                }
-            }
-        }
-        if(viewModel.isLoading && !viewModel.showLoginDialog){
-            LoadingIndicator(color = colorScheme.onPrimary, background = Color.Transparent)
-        }
-    }
-}
-
-/**********************************************************************************************/
-
-@Composable
-private fun LoadingIndicator(
-    color: Color = colorScheme.onSurface,
-    background: Color = colorScheme.surface
-){
-    Column(
+    LazyColumn(
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally,
-        modifier = Modifier
+        modifier = modifier
             .fillMaxSize()
-            .background(background)
+            .background(colorScheme.primary)
     ) {
-        CircularProgressIndicator(
-            strokeWidth = 8.dp,
-            color = color,
-            modifier = Modifier
-                .width(100.dp)
-                .align(Alignment.CenterHorizontally)
-                .background(Color.Transparent)
-        )
-        Spacer(modifier = Modifier.height(100.dp))
-        Text(
-            "Loading...",
-            style = typography.headlineMedium,
-            color = color,
-            modifier = Modifier
-        )
+        items(viewModel.reminders) {
+            if (it.reminderText.isNotEmpty()) {
+                ReminderItem(it, onNavigateToOther, viewModel)
+            }
+        }
     }
 }
 

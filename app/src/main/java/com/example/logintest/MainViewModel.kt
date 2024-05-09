@@ -13,8 +13,8 @@ import com.example.logintest.dataaccess.Reminder
 import com.example.logintest.dataaccess.ReminderAPIService
 import com.example.logintest.utils.Strings.TAG
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Dispatchers.IO
+import kotlinx.coroutines.Dispatchers.Main
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.launch
@@ -64,8 +64,8 @@ class MainViewModel @Inject constructor (
     }
 
     fun getReminders(){
-        viewModelScope.launch(Dispatchers.IO) {
-            withContext(Dispatchers.Main) {isLoading = true}
+        viewModelScope.launch(IO) {
+            withContext(Main) {isLoading = true}
 
             val fetchedReminders  = reminderService.getAllReminders()
             if(fetchedReminders.isNotEmpty()){
@@ -75,7 +75,7 @@ class MainViewModel @Inject constructor (
                 }
             }
 
-            withContext(Dispatchers.Main) {isLoading = false}
+            withContext(Main) {isLoading = false}
         }
     }
 
@@ -122,9 +122,13 @@ class MainViewModel @Inject constructor (
     }
 
     suspend fun getReminder(id: Int): Reminder? {
-        return reminderService.getReminder(id).also {
-            currentReminder = it
-        }
+        isLoading = true
+
+        currentReminder = reminderService.getReminder(id)
+        isLoading = false
+
+        return currentReminder
+
     }
 
     fun updateToken(token: String?) {
