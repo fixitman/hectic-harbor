@@ -34,7 +34,6 @@ import com.example.logintest.MainViewModel
 import com.example.logintest.dataaccess.Reminder
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
-import kotlin.system.exitProcess
 
 
 @Composable
@@ -45,7 +44,7 @@ fun MainScreen(
 ){
     val credentials = viewModel.credentials.value
     BackHandler {
-        exitProcess(0)
+        viewModel.onExit()
     }
     if(viewModel.showAuthScreen){
         AuthScreen(viewModel = viewModel)
