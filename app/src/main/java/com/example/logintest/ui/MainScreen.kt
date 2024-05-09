@@ -1,5 +1,6 @@
 package com.example.logintest.ui
 
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -17,7 +18,6 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.MaterialTheme.colorScheme
 import androidx.compose.material3.MaterialTheme.typography
 import androidx.compose.material3.Surface
@@ -35,6 +35,7 @@ import com.example.logintest.MainViewModel
 import com.example.logintest.dataaccess.Reminder
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import kotlin.system.exitProcess
 
 
 @Composable
@@ -44,10 +45,13 @@ fun MainScreen(
     viewModel: MainViewModel
 ){
     val credentials = viewModel.credentials.value
+    BackHandler {
+        exitProcess(0)
+    }
     if(viewModel.showAuthScreen){
         AuthScreen(viewModel = viewModel)
     }else{
-        MainContent(modifier,viewModel,onNavigateToOther)
+        MainContent(modifier, viewModel, onNavigateToOther)
     }
 
     if (viewModel.showLoginDialog) {
@@ -63,6 +67,7 @@ fun MainScreen(
             updateSaveCreds = viewModel::updateRemember,
         )
     }
+
 }
 
 /*********************************************************************************************************/
@@ -77,7 +82,7 @@ fun AuthScreen(viewModel: MainViewModel = viewModel()){
     Column(modifier = Modifier.fillMaxSize(), verticalArrangement = Arrangement.Center, horizontalAlignment = Alignment.CenterHorizontally) {
         Text(
             text = "Authenticating...",
-            style = MaterialTheme.typography.titleLarge
+            style = typography.titleLarge
         )
     }
 }
@@ -155,8 +160,8 @@ private fun ReminderItem(reminder: Reminder, onNavigateToOther: (Int) -> Unit, v
             .fillMaxWidth()
             .padding(24.dp)
             .clickable {
-                //onNavigateToOther(reminder.id)
-                viewModel.showSnackbar(reminder.toString())
+                onNavigateToOther(reminder.id)
+                //viewModel.showSnackbar(reminder.toString())
             }
     ){
         Text(
